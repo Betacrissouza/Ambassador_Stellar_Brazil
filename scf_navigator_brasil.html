@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCF Navigator — Stellar Community Fund</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #F9F9F8; color: #1a1a18; line-height: 1.6; }
+a { color: #185FA5; }
+.hub { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-circle { width: 32px; height: 32px; border-radius: 50%; background: #378ADD; display: flex; align-items: center; justify-content: center; }
+.logo-circle svg { width: 16px; height: 16px; }
+.logo-text { font-size: 17px; font-weight: 500; color: #1a1a18; }
+.logo-sub { font-size: 12px; color: #666; }
+.persona-tabs { display: flex; gap: 6px; }
+.ptab { padding: 5px 16px; border-radius: 99px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #ccc; background: transparent; color: #666; transition: all 0.15s; }
+.ptab.active { background: #E6F1FB; color: #0C447C; border-color: transparent; }
+.nav { display: flex; gap: 4px; margin-bottom: 1.5rem; flex-wrap: wrap; border-bottom: 1px solid #e8e8e4; padding-bottom: 12px; }
+.navbtn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid #e0e0d8; background: white; color: #666; transition: all 0.15s; }
+.navbtn.active, .navbtn:hover { background: #f0f0eb; color: #1a1a18; border-color: #ccc; }
+.section { display: none; }
+.section.visible { display: block; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.card { background: white; border: 1px solid #e8e8e4; border-radius: 10px; padding: 14px 16px; }
+.card-top { margin-bottom: 8px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; }
+.badge-blue { background: #E6F1FB; color: #0C447C; }
+.badge-teal { background: #E1F5EE; color: #085041; }
+.badge-amber { background: #FAEEDA; color: #633806; }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+.badge-red { background: #FCEBEB; color: #791F1F; }
+.badge-gray { background: #f0f0eb; color: #555; }
+.card-title { font-size: 14px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
+.card-body { font-size: 13px; color: #555; line-height: 1.6; }
+.link-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #185FA5; padding: 3px 8px; border-radius: 5px; background: #E6F1FB; margin-top: 6px; text-decoration: none; }
+.rule-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f0f0eb; font-size: 13px; color: #1a1a18; line-height: 1.5; }
+.rule-row:last-child { border-bottom: none; }
+.ri { flex-shrink: 0; width: 16px; font-size: 13px; }
+.step-list { display: flex; flex-direction: column; }
+.step { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0eb; }
+.step:last-child { border-bottom: none; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; background: #E6F1FB; color: #0C447C; font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-title { font-size: 13px; font-weight: 500; color: #1a1a18; margin-bottom: 2px; }
+.step-desc { font-size: 12px; color: #666; line-height: 1.5; }
+.tranche-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f0f0eb; font-size: 13px; }
+.tranche-row:last-child { border-bottom: none; }
+.tranche-label { width: 90px; font-size: 12px; font-weight: 500; }
+.bar-wrap { flex: 1; background: #f0f0eb; border-radius: 99px; height: 7px; overflow: hidden; }
+.bar { height: 100%; border-radius: 99px; }
+.tranche-pct { width: 32px; text-align: right; font-size: 12px; color: #888; }
+.tranche-note { font-size: 12px; color: #888; min-width: 100px; }
+.tier-row { display: grid; grid-template-columns: 100px 1fr; gap: 10px; margin-bottom: 8px; padding: 12px; background: white; border: 1px solid #e8e8e4; border-radius: 8px; }
+.tier-name { font-size: 13px; font-weight: 500; color: #1a1a18; margin-top: 4px; }
+.tier-info { font-size: 12px; color: #666; line-height: 1.5; }
+.tier-perks { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.perk { font-size: 11px; padding: 2px 7px; border-radius: 99px; background: #f0f0eb; color: #888; }
+.perk.on { background: #E1F5EE; color: #085041; }
+.tag-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.tag { font-size: 12px; padding: 3px 9px; border-radius: 99px; font-weight: 500; }
+.tag-red { background: #FCEBEB; color: #791F1F; }
+.links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+.link-card { background: white; border: 1px solid #e8e8e4; border-radius: 10px; padding: 12px 14px; text-decoration: none; display: block; transition: border-color 0.15s; }
+.link-card:hover { border-color: #aaa; }
+.link-card-label { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.link-card-title { font-size: 13px; font-weight: 500; color: #185FA5; margin-bottom: 3px; }
+.link-card-desc { font-size: 12px; color: #888; }
+.ai-box { background: white; border: 1px solid #e8e8e4; border-radius: 10px; padding: 14px 16px; }
+.quick-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.qbtn { padding: 4px 11px; border-radius: 99px; font-size: 12px; border: 1px solid #ddd; background: #f7f7f4; color: #555; cursor: pointer; }
+.qbtn:hover { background: #eeeeea; }
+.msgs { min-height: 140px; max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
+.msg { max-width: 88%; padding: 9px 13px; border-radius: 12px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+.msg-ai { background: #f0f0eb; color: #1a1a18; align-self: flex-start; border-bottom-left-radius: 3px; }
+.msg-user { background: #E6F1FB; color: #0C447C; align-self: flex-end; border-bottom-right-radius: 3px; }
+.inp-row { display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #f0f0eb; padding-top: 12px; }
+.inp-row input { flex: 1; padding: 8px 12px; border: 1px solid #ccc; border-radius: 7px; font-size: 13px; background: #f7f7f4; color: #1a1a18; outline: none; font-family: inherit; }
+.inp-row input:focus { border-color: #378ADD; }
+.send-btn { padding: 8px 16px; border-radius: 7px; background: #378ADD; color: white; border: none; font-size: 13px; font-weight: 500; cursor: pointer; }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.section-sep { margin-bottom: 10px; }
+.note { font-size: 12px; color: #888; padding: 10px 14px; background: #f7f7f4; border-radius: 7px; margin-top: 8px; }
+@media (max-width: 540px) {
+  .tier-row { grid-template-columns: 1fr; }
+  .tranche-note { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="hub">
+
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-circle">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6" stroke="white" stroke-width="1.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">SCF Navigator</div>
+        <div class="logo-sub">Stellar Community Fund — Guia interativo SCF 7.0</div>
+      </div>
+    </div>
+    <div class="persona-tabs">
+      <button class="ptab active" onclick="setPersona('builder', this)">Builder</button>
+      <button class="ptab" onclick="setPersona('embaixador', this)">Embaixador</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="navbtn active" onclick="go('inicio', this)">Início</button>
+    <button class="navbtn" onclick="go('trilhas', this)">Trilhas</button>
+    <button class="navbtn" onclick="go('passos', this)">Passo a passo</button>
+    <button class="navbtn" onclick="go('financiamento', this)">Financiamento</button>
+    <button class="navbtn" onclick="go('governanca', this)">Governança</button>
+    <button class="navbtn" onclick="go('links', this)">Links</button>
+    <button class="navbtn" onclick="go('brasil', this)">🇧🇷 Brasil</button>
+    <button class="navbtn" onclick="go('assistente', this)">💬 Assistente IA</button>
+  </div>
+
+  <!-- INÍCIO -->
+  <div id="sec-inicio" class="section visible">
+    <div class="card-grid">
+      <div class="card" style="cursor:pointer" onclick="go('passos',null)">
+        <div class="card-top"><span class="badge badge-blue">Builder</span></div>
+        <div class="card-title">Quero submeter um projeto</div>
+        <div class="card-body">Passo a passo completo: do formulário de interesse até o KYC e os pagamentos por tranche.</div>
+        <a class="link-btn" href="https://communityfund.stellar.org" target="_blank">communityfund.stellar.org ↗</a>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="go('governanca',null)">
+        <div class="card-top"><span class="badge badge-purple">Embaixador</span></div>
+        <div class="card-title">Quero votar e subir de tier</div>
+        <div class="card-body">Entenda os 4 tiers de membros verificados e como evoluir até Pilot (Tier 4) com autoridade de delegate.</div>
+        <a class="link-btn" href="https://discord.gg/stellardev" target="_blank">Discord Stellar Devs ↗</a>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="go('financiamento',null)">
+        <div class="card-top"><span class="badge badge-teal">Instaward</span></div>
+        <div class="card-title">Financiamento inicial rápido</div>
+        <div class="card-body">Instawards são financiamentos ágeis pelos Capítulos Regionais de Embaixadores para builders em fase inicial.</div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="go('assistente',null)">
+        <div class="card-top"><span class="badge badge-amber">IA</span></div>
+        <div class="card-title">Tem dúvidas? Assistente IA</div>
+        <div class="card-body">Pergunte sobre elegibilidade, trilhas, governança, tranches ou qualquer regra do SCF em português.</div>
+      </div>
+    </div>
+    <div class="card section-sep">
+      <div class="card-top"><span class="badge badge-red">Projetos proibidos — desqualificação imediata</span></div>
+      <div class="card-body">
+        <div class="tag-wrap">
+          <span class="tag tag-red">Atividades ilegais</span>
+          <span class="tag tag-red">Jogos de azar</span>
+          <span class="tag tag-red">Malware / phishing</span>
+          <span class="tag tag-red">Pump de token sem uso real</span>
+          <span class="tag tag-red">Conteúdo sexual/ofensivo</span>
+          <span class="tag tag-red">Discriminação</span>
+          <span class="tag tag-red">Dados arbitrários na Stellar</span>
+          <span class="tag tag-red">Violação de PI</span>
+          <span class="tag tag-red">Tráfico / terrorismo / fraude</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRILHAS -->
+  <div id="sec-trilhas" class="section">
+    <div class="card-grid section-sep">
+      <div class="card">
+        <div class="card-top"><span class="badge badge-purple">Open Track</span></div>
+        <div class="card-title">Times experientes, ideias novas</div>
+        <div class="card-body">Para equipes com histórico comprovado que querem construir algo inovador. Passa por voto comunitário via NQG.</div>
+      </div>
+      <div class="card">
+        <div class="card-top"><span class="badge badge-blue">Integration Track</span></div>
+        <div class="card-title">Integração de soluções existentes</div>
+        <div class="card-body">Para projetos que integram produtos ou plataformas já existentes ao ecossistema Stellar. Avaliação simplificada.</div>
+      </div>
+      <div class="card">
+        <div class="card-top"><span class="badge badge-teal">RFP Track</span></div>
+        <div class="card-title">Respostas a RFPs ativos da SCF</div>
+        <div class="card-body">Para times que respondem a pedidos de propostas publicados pela SCF. Escopo definido, alinhado com prioridades do ecossistema.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge badge-gray">Elegibilidade pessoal</span></div>
+      <div class="card-body">
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>18 anos ou mais</div>
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>Fora de países sancionados pelo OFAC (Cuba, Irã, Coreia do Norte, regiões ucranianas sob controle russo)</div>
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>Não constar na lista SDN de pessoas bloqueadas</div>
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>Não residir em jurisdição onde cripto seja ilegal sem licença especial</div>
+        <div class="rule-row"><span class="ri" style="color:#E24B4A">✗</span>Não pode participar de mais de um time/organização simultaneamente</div>
+        <div class="rule-row"><span class="ri" style="color:#E24B4A">✗</span>KYC/KYB obrigatório antes de qualquer pagamento (<a href="https://stellar.org/bd-kyc" target="_blank">stellar.org/bd-kyc</a>)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO A PASSO -->
+  <div id="sec-passos" class="section">
+    <div class="card section-sep">
+      <div class="card-title" style="margin-bottom:12px">Jornada do builder — do interesse ao mainnet</div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div><div class="step-title">Formulário de interesse</div><div class="step-desc">Submeta pelo site oficial. Revisão acontece continuamente — sem prazo fechado para entrar na fila.</div><a class="link-btn" href="https://communityfund.stellar.org" target="_blank">communityfund.stellar.org ↗</a></div></div>
+        <div class="step"><div class="step-num">2</div><div><div class="step-title">Indicação (referral) — altamente recomendada</div><div class="step-desc">Um membro da comunidade que conhece seu projeto pode indicá-lo. O referrer confirma o contexto e aumenta a chance de convite.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div><div class="step-title">Convite para submissão</div><div class="step-desc">Se elegível, o time recebe convite por e-mail com o prazo da rodada atual.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div><div class="step-title">Submissão completa</div><div class="step-desc">Inclua: roadmap técnico, orçamento detalhado por tranche, métricas de tração e perfil completo do time.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div><div class="step-title">Triagem + revisão do painel</div><div class="step-desc">SDF e revisores comunitários avaliam valor para o ecossistema, viabilidade técnica e clareza do projeto.</div></div></div>
+        <div class="step"><div class="step-num">6</div><div><div class="step-title">Voto comunitário (Open Track)</div><div class="step-desc">Membros verificados votam via Neural Quorum Governance (NQG). Peso do voto é proporcional à reputação.</div></div></div>
+        <div class="step"><div class="step-num">7</div><div><div class="step-title">KYC / KYB</div><div class="step-desc">Verificação obrigatória antes de qualquer pagamento.</div><a class="link-btn" href="https://stellar.org/bd-kyc" target="_blank">stellar.org/bd-kyc ↗</a></div></div>
+        <div class="step"><div class="step-num">8</div><div><div class="step-title">Entrega das tranches</div><div class="step-desc">Pagamentos em 4 etapas: aprovação (10%), MVP (20%), Testnet (30%), Mainnet ao vivo (40%). Valor calculado em XLM pelo preço do dia do pagamento.</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge badge-blue">Para reaplicar com projeto anterior</span></div>
+      <div class="card-body">
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>Todas as entregas anteriores devem estar 100% concluídas</div>
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>Produto deve estar ao vivo e testável</div>
+        <div class="rule-row"><span class="ri" style="color:#1D9E75">✓</span>Apresentar métricas on-chain de tração</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIAMENTO -->
+  <div id="sec-financiamento" class="section">
+    <div class="card section-sep">
+      <div class="card-title" style="margin-bottom:12px">Pagamentos por tranche — Build Award</div>
+      <div class="tranche-row"><div class="tranche-label">Tranche #0</div><div class="bar-wrap"><div class="bar" style="width:10%;background:#B5D4F4"></div></div><div class="tranche-pct">10%</div><div class="tranche-note">Aprovação inicial</div></div>
+      <div class="tranche-row"><div class="tranche-label">Tranche #1</div><div class="bar-wrap"><div class="bar" style="width:20%;background:#85B7EB"></div></div><div class="tranche-pct">20%</div><div class="tranche-note">MVP entregue</div></div>
+      <div class="tranche-row"><div class="tranche-label">Tranche #2</div><div class="bar-wrap"><div class="bar" style="width:30%;background:#378ADD"></div></div><div class="tranche-pct">30%</div><div class="tranche-note">Testnet</div></div>
+      <div class="tranche-row"><div class="tranche-label">Tranche #3</div><div class="bar-wrap"><div class="bar" style="width:40%;background:#185FA5"></div></div><div class="tranche-pct">40%</div><div class="tranche-note">Mainnet ao vivo</div></div>
+    </div>
+    <div class="card-grid section-sep">
+      <div class="card">
+        <div class="card-top"><span class="badge badge-blue">Limites de financiamento</span></div>
+        <div class="card-body">
+          <div class="rule-row"><span class="ri">★</span>Até $150.000 em XLM por projeto (acumulado)</div>
+          <div class="rule-row"><span class="ri">★</span>Acima de $150k podem solicitar até $300k — análise caso a caso</div>
+          <div class="rule-row"><span class="ri">★</span>Valor em XLM pelo preço XLMUSD_RR no dia do pagamento</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top"><span class="badge badge-teal">Instawards</span></div>
+        <div class="card-body">Financiamentos menores e ágeis pelos Capítulos Regionais de Embaixadores. Voltados a builders em fase inicial com escopo claro e curta duração. Ideal para projetos locais e comunidades emergentes.</div>
+        <a class="link-btn" href="https://stellarregionalambassadors.notion.site" target="_blank">Programa de Embaixadores ↗</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="badge badge-red">Uso proibido dos fundos XLM</span></div>
+      <div class="card-body">
+        <div class="tag-wrap">
+          <span class="tag tag-red">Wash trading</span>
+          <span class="tag tag-red">Vender XLM a descoberto</span>
+          <span class="tag tag-red">Prometer rendimentos sobre XLM</span>
+          <span class="tag tag-red">Marketing com XLM sem aprovação SDF</span>
+          <span class="tag tag-red">Consultoria de investimento</span>
+          <span class="tag tag-red">Transações com jurisdições sancionadas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOVERNANÇA -->
+  <div id="sec-governanca" class="section">
+    <div class="section-sep">
+      <div class="tier-row">
+        <div><span class="badge badge-teal">Tier 1</span><div class="tier-name">Verified</div></div>
+        <div class="tier-info">Ponto de entrada. Verificação de identidade e conta.<div class="tier-perks"><span class="perk on">Ver discussões</span><span class="perk">Sem voto</span><span class="perk">Sem delegação</span></div></div>
+      </div>
+      <div class="tier-row">
+        <div><span class="badge badge-blue">Tier 2</span><div class="tier-name">Pathfinder</div></div>
+        <div class="tier-info">Demonstra expertise em Stellar / Soroban.<div class="tier-perks"><span class="perk on">Ver discussões</span><span class="perk on">Delegar votos</span><span class="perk">Sem voto ativo</span></div></div>
+      </div>
+      <div class="tier-row">
+        <div><span class="badge badge-purple">Tier 3</span><div class="tier-name">Navigator</div></div>
+        <div class="tier-info">Participante ativo. Pode votar na alocação de prêmios.<div class="tier-perks"><span class="perk on">Ver discussões</span><span class="perk on">Delegar votos</span><span class="perk on">Votação ativa</span><span class="perk on">Eventos</span></div></div>
+      </div>
+      <div class="tier-row" style="border-color:#9FE1CB">
+        <div><span class="badge" style="background:#9FE1CB;color:#04342C">Tier 4</span><div class="tier-name">Pilot</div></div>
+        <div class="tier-info">Autoridade máxima. Delegate trimestral e governança.<div class="tier-perks"><span class="perk on">Tudo do Tier 3</span><span class="perk on">Delegate trimestral</span><span class="perk on">Discussões exclusivas</span><span class="perk on">Propor governança</span></div></div>
+      </div>
+    </div>
+    <div class="card-grid section-sep">
+      <div class="card">
+        <div class="card-top"><span class="badge badge-purple">Neural Quorum Governance (NQG)</span></div>
+        <div class="card-body">Mecanismo de votação baseado em reputação, criado pelo BlockScience + SDF, em uso desde outubro de 2023. Peso do voto proporcional à reputação. Combate fadiga de votação e concentração de poder.</div>
+      </div>
+      <div class="card">
+        <div class="card-top"><span class="badge badge-blue">Como entrar e evoluir</span></div>
+        <div class="card-body">
+          <div class="rule-row"><span class="ri">1.</span>Entre no Stellar Developers Discord</div>
+          <div class="rule-row"><span class="ri">2.</span>Acesse o canal #scf-general</div>
+          <div class="rule-row"><span class="ri">3.</span>Passe pela verificação de identidade</div>
+          <div class="rule-row"><span class="ri">4.</span>Demonstre expertise, participe ativamente e acumule reputação</div>
+          <a class="link-btn" href="https://discord.gg/stellardev" target="_blank">discord.gg/stellardev ↗</a>
+        </div>
+      </div>
+    </div>
+    <div class="note">Nenhum tier é permanente — roles são mantidos por participação contínua e posição relativa na comunidade. Um Pilot pode perder o status se parar de contribuir.</div>
+  </div>
+
+  <!-- LINKS -->
+  <div id="sec-links" class="section">
+    <div class="links-grid">
+      <a class="link-card" href="https://communityfund.stellar.org" target="_blank">
+        <div class="link-card-label">Portal principal</div>
+        <div class="link-card-title">communityfund.stellar.org</div>
+        <div class="link-card-desc">Formulário de interesse, rodadas abertas e status de projetos</div>
+      </a>
+      <a class="link-card" href="https://stellar.gitbook.io/scf-handbook" target="_blank">
+        <div class="link-card-label">Documentação completa</div>
+        <div class="link-card-title">SCF Handbook (GitBook)</div>
+        <div class="link-card-desc">Regras completas, elegibilidade, trilhas e NQG</div>
+      </a>
+      <a class="link-card" href="https://discord.gg/stellardev" target="_blank">
+        <div class="link-card-label">Comunidade</div>
+        <div class="link-card-title">Discord Stellar Devs</div>
+        <div class="link-card-desc">Canal #scf-general — verificação e discussões de governança</div>
+      </a>
+      <a class="link-card" href="https://stellar.org/bd-kyc" target="_blank">
+        <div class="link-card-label">KYC / KYB</div>
+        <div class="link-card-title">stellar.org/bd-kyc</div>
+        <div class="link-card-desc">Verificação obrigatória antes do recebimento dos fundos</div>
+      </a>
+      <a class="link-card" href="https://stellarregionalambassadors.notion.site" target="_blank">
+        <div class="link-card-label">Embaixadores</div>
+        <div class="link-card-title">Programa Regional de Embaixadores</div>
+        <div class="link-card-desc">Handbook dos Capítulos Regionais e Instawards</div>
+      </a>
+      <a class="link-card" href="https://stellar.org/developers" target="_blank">
+        <div class="link-card-label">Desenvolvedores</div>
+        <div class="link-card-title">stellar.org/developers</div>
+        <div class="link-card-desc">Documentação técnica, Soroban e recursos para builders</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BRASIL -->
+  <div id="sec-brasil" class="section">
+
+    <!-- Capítulo Brasil -->
+    <div class="card section-sep" style="border-left: 3px solid #009B3A;">
+      <div class="card-top"><span class="badge badge-teal">🇧🇷 Capítulo Brasil — Lançamento Oficial</span></div>
+      <div class="card-title" style="margin-bottom:8px">Stellar Brazilian Ambassador Chapter</div>
+      <div class="card-body">
+        O Brasil se consolidou como um dos maiores centros de inovação do ecossistema Stellar, com projetos de destaque como <strong>Soroswap, Cheesecake Lab, Emigro, Oinc e Nearx</strong>. A expertise técnica e o entusiasmo da comunidade brasileira no Discord tornaram o Brasil o próximo passo natural do Programa de Embaixadores.
+        <br><br>
+        Os eventos do Capítulo Brasil focam em <strong>arquitetura técnica, colaboração em equipe, estudantes universitários e build-a-thons</strong>. O Capítulo é liderado por <strong>Caio Mattos</strong> (Nearx), que coordena a estratégia regional, identifica líderes emergentes e garante o orçamento necessário.
+        <br><br>
+        Embaixadores interessados em hospedar eventos devem participar regularmente das reuniões — a frequência é um fator-chave na seleção dos eventos mensais.
+      </div>
+    </div>
+    <div class="card-grid section-sep">
+      <a class="link-card" href="https://stellarregionalambassadors.notion.site" target="_blank">
+        <div class="link-card-label">Candidatura</div>
+        <div class="link-card-title">Apply to join!</div>
+        <div class="link-card-desc">Candidate-se para ser Embaixador do Capítulo Brasil</div>
+      </a>
+      <a class="link-card" href="https://x.com/StellarBrazil" target="_blank">
+        <div class="link-card-label">Redes sociais</div>
+        <div class="link-card-title">Follow Stellar Brazil on X</div>
+        <div class="link-card-desc">Acompanhe novidades, eventos e anúncios</div>
+      </a>
+      <a class="link-card" href="https://lu.ma/stellarbrazil" target="_blank">
+        <div class="link-card-label">Agenda</div>
+        <div class="link-card-title">Check out all events on Luma</div>
+        <div class="link-card-desc">Todos os eventos do Capítulo Brasil em um só lugar</div>
+      </a>
+      <a class="link-card" href="https://discord.gg/stellardev" target="_blank">
+        <div class="link-card-label">Comunidade</div>
+        <div class="link-card-title">Stellar Brazil no Discord</div>
+        <div class="link-card-desc">Conecte-se com builders e embaixadores brasileiros</div>
+      </a>
+    </div>
+
+    <!-- O que é um Embaixador Blockchain -->
+    <div class="card section-sep">
+      <div class="card-top"><span class="badge badge-purple">O que é um Embaixador de Blockchain?</span></div>
+      <div class="card-body">
+        Um Embaixador de Blockchain é um representante e promotor de uma plataforma ou projeto específico — escolhido por sua paixão, conhecimento e influência dentro da comunidade.
+      </div>
+      <div class="card-grid" style="margin-top:12px">
+        <div class="card" style="border:none;background:#f7f7f4;padding:12px">
+          <div class="card-title" style="font-size:13px;margin-bottom:6px">🎯 Funções & Responsabilidades</div>
+          <div class="card-body">
+            <div class="rule-row"><span class="ri">📣</span>Educação e divulgação da tecnologia blockchain</div>
+            <div class="rule-row"><span class="ri">🤝</span>Engajamento e fortalecimento da comunidade local</div>
+            <div class="rule-row"><span class="ri">📢</span>Marketing e promoção do projeto</div>
+            <div class="rule-row"><span class="ri">💡</span>Feedback e sugestões à equipe do projeto</div>
+            <div class="rule-row"><span class="ri">🏆</span>Representação da marca em eventos e mídia</div>
+          </div>
+        </div>
+        <div class="card" style="border:none;background:#f7f7f4;padding:12px">
+          <div class="card-title" style="font-size:13px;margin-bottom:6px">✨ Habilidades & Qualidades</div>
+          <div class="card-body">
+            <div class="rule-row"><span class="ri">⛓️</span>Entendimento profundo de blockchain e Stellar</div>
+            <div class="rule-row"><span class="ri">🗣️</span>Habilidade de comunicar conceitos complexos</div>
+            <div class="rule-row"><span class="ri">🌐</span>Rede e influência na comunidade</div>
+            <div class="rule-row"><span class="ri">🔥</span>Paixão e entusiasmo pelo projeto</div>
+            <div class="rule-row"><span class="ri">🚀</span>Proatividade e criatividade constantes</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:10px;border:none;background:#E1F5EE;padding:12px">
+        <div class="card-title" style="font-size:13px;margin-bottom:6px;color:#085041">🎁 Benefícios de ser Embaixador</div>
+        <div class="card-body" style="color:#085041">
+          <div class="rule-row" style="color:#085041"><span class="ri">🌟</span>Contribuir para uma tecnologia transformadora</div>
+          <div class="rule-row" style="color:#085041"><span class="ri">📚</span>Aprender com líderes e especialistas do setor</div>
+          <div class="rule-row" style="color:#085041"><span class="ri">👤</span>Construir e fortalecer sua marca pessoal</div>
+          <div class="rule-row" style="color:#085041"><span class="ri">💰</span>Possibilidade de recompensas em tokens e incentivos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stellar Passaporte -->
+    <div class="card section-sep" style="border-left: 3px solid #378ADD;">
+      <div class="card-top"><span class="badge badge-blue">🛂 Stellar Passaporte</span></div>
+      <div class="card-title" style="margin-bottom:8px">Programa de Reconhecimento de Contribuidores</div>
+      <div class="card-body">
+        O <strong>Stellar Passaporte</strong> é o programa de reconhecimento e gamificação do ecossistema Stellar para a comunidade brasileira. Funciona como um "passaporte digital" que registra a jornada de cada membro, acumulando <strong>carimbos (stamps)</strong> ao participar de eventos, workshops, build-a-thons e atividades da comunidade.
+        <br><br>
+        Cada carimbo representa uma conquista ou participação verificada — quanto mais ativo o membro, mais rico fica seu passaporte e maiores as oportunidades de reconhecimento e benefícios dentro do ecossistema.
+      </div>
+      <div class="card-grid" style="margin-top:12px">
+        <div class="card" style="border:none;background:#E6F1FB;padding:12px">
+          <div class="card-title" style="font-size:13px;margin-bottom:6px">Como acumular carimbos</div>
+          <div class="card-body">
+            <div class="rule-row"><span class="ri">🎪</span>Participar de eventos e meetups do Capítulo Brasil</div>
+            <div class="rule-row"><span class="ri">🛠️</span>Contribuir em build-a-thons e hackathons</div>
+            <div class="rule-row"><span class="ri">🎓</span>Completar workshops e trilhas educacionais</div>
+            <div class="rule-row"><span class="ri">📝</span>Criar conteúdo técnico para a comunidade</div>
+            <div class="rule-row"><span class="ri">🌍</span>Representar o Stellar em eventos externos</div>
+          </div>
+        </div>
+        <div class="card" style="border:none;background:#E6F1FB;padding:12px">
+          <div class="card-title" style="font-size:13px;margin-bottom:6px">Benefícios do Passaporte</div>
+          <div class="card-body">
+            <div class="rule-row"><span class="ri">🏅</span>Reconhecimento público na comunidade Stellar</div>
+            <div class="rule-row"><span class="ri">🔓</span>Acesso a eventos e conteúdos exclusivos</div>
+            <div class="rule-row"><span class="ri">📈</span>Progressão acelerada nos tiers do SCF</div>
+            <div class="rule-row"><span class="ri">🤝</span>Networking com builders e líderes do ecossistema</div>
+            <div class="rule-row"><span class="ri">🎯</span>Elegibilidade prioritária para Instawards</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 37 Graus Accelerator -->
+    <div class="card section-sep" style="border-left: 3px solid #E8A838;">
+      <div class="card-top"><span class="badge badge-amber">🚀 Stellar 37 Graus — Programa de Aceleração de Startups</span></div>
+      <div class="card-title" style="margin-bottom:8px">Lançamento no Rio de Janeiro</div>
+      <div class="card-body">
+        O <strong>Stellar 37 Graus</strong> é o programa de aceleração de startups do ecossistema Stellar para o Brasil, com lançamento no <strong>Rio de Janeiro</strong>. O nome homenageia a temperatura média carioca — quente como a energia do empreendedorismo e inovação que o programa busca impulsionar.
+        <br><br>
+        O programa conecta <strong>startups em estágio inicial</strong> com mentores especializados em blockchain, investidores alinhados ao ecossistema Stellar e recursos técnicos do SDF, acelerando o desenvolvimento de projetos com potencial de impacto real na rede.
+      </div>
+      <div class="card-grid" style="margin-top:12px">
+        <div class="card" style="border:none;background:#FAEEDA;padding:12px">
+          <div class="card-title" style="font-size:13px;margin-bottom:6px;color:#633806">🎯 Foco do Programa</div>
+          <div class="card-body" style="color:#633806">
+            <div class="rule-row" style="color:#633806"><span class="ri">🏗️</span>Startups construindo sobre Stellar/Soroban</div>
+            <div class="rule-row" style="color:#633806"><span class="ri">💳</span>Fintechs e soluções de pagamento</div>
+            <div class="rule-row" style="color:#633806"><span class="ri">🌎</span>Projetos de impacto social e financeiro</div>
+            <div class="rule-row" style="color:#633806"><span class="ri">🎓</span>Times fundadores universitários</div>
+          </div>
+        </div>
+        <div class="card" style="border:none;background:#FAEEDA;padding:12px">
+          <div class="card-title" style="font-size:13px;margin-bottom:6px;color:#633806">📦 O que o programa oferece</div>
+          <div class="card-body" style="color:#633806">
+            <div class="rule-row" style="color:#633806"><span class="ri">🧭</span>Mentoria técnica com especialistas Stellar</div>
+            <div class="rule-row" style="color:#633806"><span class="ri">💰</span>Conexão com funding via SCF e Instawards</div>
+            <div class="rule-row" style="color:#633806"><span class="ri">🛠️</span>Acesso a ferramentas e infraestrutura do SDF</div>
+            <div class="rule-row" style="color:#633806"><span class="ri">🌐</span>Visibilidade no ecossistema global Stellar</div>
+          </div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:10px;background:#FAEEDA;color:#633806">
+        📍 <strong>Rio de Janeiro</strong> é a cidade-sede do lançamento do 37 Graus, consolidando o RJ como hub estratégico de inovação blockchain no Brasil. Fique de olho nos canais do Capítulo Brasil para inscrições e datas dos próximos ciclos.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ASSISTENTE IA -->
+  <div id="sec-assistente" class="section">
+    <div class="ai-box">
+      <div class="quick-btns">
+        <button class="qbtn" onclick="ask('Qual é o limite de financiamento por projeto?')">Limite de financiamento</button>
+        <button class="qbtn" onclick="ask('Quais são os requisitos para reaplicar com projeto anterior?')">Reaplicar com projeto</button>
+        <button class="qbtn" onclick="ask('Como subir para Tier 4 Pilot?')">Chegar ao Tier 4</button>
+        <button class="qbtn" onclick="ask('O que é o Neural Quorum Governance?')">O que é NQG?</button>
+        <button class="qbtn" onclick="ask('Quais projetos são proibidos no SCF?')">Projetos proibidos</button>
+        <button class="qbtn" onclick="ask('O que é o Stellar Passaporte e como acumular carimbos?')">Stellar Passaporte</button>
+        <button class="qbtn" onclick="ask('O que é o programa de aceleração Stellar 37 Graus no RJ?')">37 Graus RJ</button>
+        <button class="qbtn" onclick="ask('Como funciona o Capítulo Brasil de Embaixadores?')">Capítulo Brasil</button>
+        <button class="qbtn" onclick="ask('O que faz um Embaixador de Blockchain Stellar?')">Papel do Embaixador</button>
+      </div>
+      <div class="msgs" id="msgs">
+        <div class="msg msg-ai">Olá! Sou o assistente do SCF Navigator, treinado nas regras do Stellar Community Fund (SCF 7.0). Pergunte sobre elegibilidade, trilhas, governança, financiamento ou qualquer regra do programa — em português.</div>
+      </div>
+      <div class="inp-row">
+        <input type="text" id="inp" placeholder="Digite sua pergunta sobre o SCF..." />
+        <button class="send-btn" id="sbtn" onclick="send()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SYSTEM = `Você é um assistente especializado nas regras do Stellar Community Fund (SCF 7.0, vigente desde janeiro de 2026). Responda sempre em português do Brasil, de forma clara, objetiva e amigável. Baseie-se nestas informações:
+
+ELEGIBILIDADE PESSOAL: 18+ anos, fora de países sancionados OFAC (Cuba, Irã, Coreia do Norte, regiões ucranianas sob controle russo), não constar na lista SDN, não residir em jurisdição onde cripto seja ilegal sem licença especial. Times: um representante oficial, ao menos 2 membros disponíveis, KYC/KYB obrigatório antes do pagamento. Uma pessoa não pode participar de mais de um time/organização simultaneamente.
+
+TRILHAS: Open Track (times experientes com ideias novas, passa por voto NQG), Integration Track (integração de soluções existentes ao ecossistema Stellar), RFP Track (responde a RFPs ativos publicados pela SCF).
+
+FINANCIAMENTO: Até $150k em XLM por projeto acumulado. Acima de $150k, podem solicitar até $300k mediante análise caso a caso. Valor calculado em XLM pelo XLMUSD_RR no dia do pagamento. Tranches: #0=10% (aprovação inicial), #1=20% (MVP entregue), #2=30% (Testnet), #3=40% (Mainnet ao vivo). Instawards são financiamentos menores e ágeis oferecidos pelos Capítulos Regionais de Embaixadores para builders em fase inicial.
+
+PROJETOS PROIBIDOS: atividades ilegais, jogos de azar, conteúdo sexual/ofensivo, discriminação, malware/phishing, pump de token/NFT sem uso real, tráfico/terrorismo/fraude, uso da Stellar apenas para armazenamento arbitrário de dados, violação de propriedade intelectual.
+
+USO PROIBIDO DOS FUNDOS XLM: wash trading, vender XLM a descoberto, prometer rendimentos sobre XLM, usar XLM em marketing sem aprovação do SDF, dar consultoria de investimento, transações com jurisdições sancionadas.
+
+PROCESSO PARA PROJETOS: 1) Formulário de interesse em communityfund.stellar.org (revisão contínua, sem prazo fechado), 2) Referral/indicação é altamente recomendado, 3) Se elegível, convite por e-mail com prazo da rodada, 4) Submissão completa com roadmap técnico, orçamento por tranche, métricas e perfil do time, 5) Triagem SDF + revisores comunitários, 6) Voto NQG (apenas Open Track), 7) KYC/KYB em stellar.org/bd-kyc.
+
+REAPLICAÇÃO: todas as entregas anteriores devem estar concluídas, produto deve estar ao vivo e testável, apresentar métricas on-chain de tração.
+
+TIERS DE MEMBROS VERIFICADOS:
+- Tier 1 Verified: ver discussões no #verified-panel. Sem delegação, sem voto.
+- Tier 2 Pathfinder: + delegar votos no Community Vote e participar de discussões.
+- Tier 3 Navigator: + votação ativa + convites para eventos virtuais e presenciais.
+- Tier 4 Pilot: + delegate trimestral + discussões exclusivas + propor e votar em governança.
+Nenhum tier é permanente — mantidos por participação contínua e posição relativa na comunidade.
+
+NQG (Neural Quorum Governance): mecanismo de votação baseado em reputação. Criado pelo BlockScience + SDF, em uso desde outubro de 2023. Combate fadiga de votação, apatia e concentração de poder. Quorum Delegation permite delegar sem confiar em um único delegate. Peso do voto proporcional à reputação acumulada.
+
+COMO SE TORNAR MEMBRO VERIFICADO: Discord Stellar Devs (discord.gg/stellardev) → canal #scf-general → verificação de identidade → progressão de tier por expertise demonstrada, participação em governança e reputação acumulada.
+
+LINKS IMPORTANTES: communityfund.stellar.org (portal e formulário), stellar.gitbook.io/scf-handbook (handbook completo), discord.gg/stellardev (Discord), stellar.org/bd-kyc (KYC/KYB), stellarregionalambassadors.notion.site (programa de embaixadores regionais), stellar.org/developers (documentação técnica).
+
+CAPÍTULO BRASIL: O Stellar Brazilian Ambassador Chapter foi lançado oficialmente. O Brasil se destacou com projetos como Soroswap, Cheesecake Lab, Emigro, Oinc e Nearx. Liderado por Caio Mattos (Nearx), o capítulo foca em arquitetura técnica, colaboração, estudantes universitários e build-a-thons. Eventos no Luma (lu.ma/stellarbrazil), redes no X (@StellarBrazil) e Discord. Candidatura em stellarregionalambassadors.notion.site.
+
+STELLAR PASSAPORTE: Programa de reconhecimento e gamificação do ecossistema Stellar Brasil. Funciona como passaporte digital com "carimbos (stamps)" acumulados ao participar de eventos, workshops, build-a-thons e atividades. Benefícios: reconhecimento público, acesso a eventos exclusivos, progressão acelerada nos tiers SCF, networking e elegibilidade prioritária para Instawards.
+
+STELLAR 37 GRAUS (RJ): Programa de aceleração de startups do ecossistema Stellar com lançamento no Rio de Janeiro. Nome referencia a temperatura média carioca. Foco em startups em estágio inicial sobre Stellar/Soroban, fintechs, impacto social, e times universitários. Oferece mentoria técnica, conexão com SCF/Instawards, acesso a ferramentas SDF e visibilidade global. RJ é hub estratégico de inovação blockchain no Brasil.
+
+O QUE É EMBAIXADOR BLOCKCHAIN: Representante e promotor escolhido por paixão, conhecimento e influência. Funções: educação/divulgação, engajamento da comunidade, marketing, feedback ao projeto, representação da marca. Benefícios: contribuição para tecnologia inovadora, networking com especialistas, fortalecimento da marca pessoal, possibilidade de recompensas em tokens.
+
+Se não souber algo específico, diga que a informação não está disponível no material consultado e sugira verificar diretamente em stellar.gitbook.io/scf-handbook.`;
+
+let history = [];
+
+async function send() {
+  const inp = document.getElementById('inp');
+  const btn = document.getElementById('sbtn');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  btn.disabled = true;
+  addMsg(text, 'user');
+  history.push({ role: 'user', content: text });
+  const id = 'typing-' + Date.now();
+  addMsg('Digitando...', 'ai', id);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM, messages: history })
+    });
+    const data = await res.json();
+    const reply = (data.content || []).map(i => i.text || '').join('');
+    document.getElementById(id)?.remove();
+    addMsg(reply || 'Não foi possível obter resposta.', 'ai');
+    history.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById(id)?.remove();
+    addMsg('Erro ao conectar com o assistente. Verifique sua conexão e tente novamente.', 'ai');
+  }
+  btn.disabled = false;
+  inp.focus();
+}
+
+function addMsg(text, type, id) {
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg msg-' + type;
+  if (id) d.id = id;
+  d.textContent = text;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function ask(q) {
+  document.getElementById('inp').value = q;
+  go('assistente', null);
+  send();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inp').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+});
+
+function go(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('sec-' + id)?.classList.add('visible');
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    document.querySelectorAll('.navbtn').forEach(b => {
+      if (b.getAttribute('onclick')?.includes("'" + id + "'")) b.classList.add('active');
+    });
+  }
+}
+
+function setPersona(p, btn) {
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  go(p === 'embaixador' ? 'governanca' : 'inicio', null);
+}
+</script>
+</body>
+</html>
